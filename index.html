@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MorseLearn — Aprenda Código Morse</title>
+<style>
+:root{--bg:#0e1a2b;--card:#17263c;--bd:#2b4060;--tx:#e8edf5;--mut:#8fa3bf;--br:#f0b43c;--ok:#3ecf8e;--err:#f0605d}
+*{box-sizing:border-box;margin:0}
+body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;display:flex;flex-direction:column;line-height:1.5}
+h1,h2,.dk{font-family:Rockwell,"Roboto Slab",Georgia,serif}
+header,footer{text-align:center;padding:1rem;border-bottom:1px solid var(--bd)}
+footer{border:0;border-top:1px solid var(--bd);margin-top:auto}
+header h1{font-size:2rem;color:var(--br)}
+.cr{font-size:.85rem;color:var(--mut)}
+main{width:100%;max-width:760px;margin:0 auto;padding:1rem}
+nav{display:flex;gap:.5rem;margin-bottom:1rem}
+.tab{flex:1;padding:.8rem;border-radius:12px;border:2px solid var(--bd);background:none;color:var(--mut);font-size:1rem;font-weight:700;cursor:pointer}
+.tab.on{border-color:var(--br);color:var(--br);background:#f0b43c14}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:1.2rem;text-align:center}
+.btn{background:var(--br);color:#1b1405;border:0;border-radius:12px;padding:.7rem 1.2rem;font-size:1rem;font-weight:700;cursor:pointer;margin:.3rem}
+.btn:hover{filter:brightness(1.1)}
+.sec{background:none;color:var(--tx);border:2px solid var(--bd)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #fff;outline-offset:2px}
+.d,.l,.sp{display:inline-block;height:14px;margin:0 4px;vertical-align:middle}
+.d{width:14px;border-radius:50%;background:var(--br)}
+.l{width:42px;border-radius:7px;background:var(--br)}
+.sp{width:18px}
+.big{min-height:48px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;margin:.8rem 0}
+.dk{font-size:4rem;line-height:1.1;color:var(--br)}
+.mut{color:var(--mut)}
+.pb{height:12px;background:var(--card);border-radius:6px;overflow:hidden;border:1px solid var(--bd)}
+.pb div{height:100%;width:0;background:var(--br);transition:width .4s}
+.sub{display:flex;justify-content:space-between;font-size:.9rem;color:var(--mut);margin:.4rem 0 1rem}
+h2{margin:1.4rem 0 .6rem;font-size:1.2rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:.5rem}
+.ch{background:var(--card);border:2px solid var(--bd);border-radius:12px;padding:.5rem .2rem;color:var(--tx);cursor:pointer;display:flex;flex-direction:column;align-items:center}
+.ch b{font-size:1.5rem;font-family:Rockwell,Georgia,serif}
+.ch small{font-family:monospace;font-size:.85rem;color:var(--mut);letter-spacing:2px}
+.ch.seen{border-color:#f0b43c66}
+.ch:hover{border-color:var(--br)}
+#det{margin-bottom:1rem}
+.top{display:flex;flex-wrap:wrap;gap:.8rem;align-items:center;justify-content:space-between;margin-bottom:.6rem;font-size:.95rem}
+select,input{background:var(--bg);color:var(--tx);border:2px solid var(--bd);border-radius:10px;padding:.4rem .6rem;font-size:1rem}
+#ans{width:90px;text-align:center;font-size:2rem;margin:.6rem;text-transform:uppercase}
+.ask{font-size:1.1rem}
+.tgt{font-size:2rem;color:var(--br);font-family:Rockwell,Georgia,serif;letter-spacing:3px}
+.opts{display:grid;grid-template-columns:repeat(2,1fr);gap:.7rem;margin-top:1rem}
+.opt{font-size:1.8rem;margin:0;background:var(--bg);color:var(--tx);border:2px solid var(--bd)}
+.opt.ok,.opt.ok:hover{background:var(--ok);color:#06251a;border-color:var(--ok)}
+.opt.err{background:var(--err);color:#2b0a09;border-color:var(--err)}
+.fb{margin-top:1rem;padding:1rem;border-radius:14px;border:2px solid;text-align:center}
+.fb.ok{border-color:var(--ok);background:#3ecf8e1f}
+.fb.err{border-color:var(--err);background:#f0605d1f}
+.fb p{font-family:monospace;font-size:1.1rem;margin:.3rem 0}
+.shake{animation:sh .3s}
+@keyframes sh{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+@media(prefers-reduced-motion:reduce){.shake{animation:none}.pb div{transition:none}}
+</style>
+</head>
+<body>
+<header>
+  <h1>MorseLearn</h1>
+  <div class="cr">MorseLearn — Criado e desenvolvido por dineebr</div>
+</header>
+
+<main>
+  <nav>
+    <button class="tab on" data-tab="learn">📖 1. Aprender</button>
+    <button class="tab" data-tab="prac">🎯 2. Praticar</button>
+  </nav>
+
+  <section id="learn">
+    <p class="mut">Toque em cada letra ou número para ouvir o som. Ponto é um sinal curto, traço é um sinal longo (3 vezes maior).</p>
+    <div class="sub" style="margin-top:1rem"><span>Progresso do estudo</span><span id="lp"></span></div>
+    <div class="pb" style="margin:-.6rem 0 1rem"><div id="lbar"></div></div>
+    <div class="card" id="det"><p class="mut">Escolha um caractere abaixo para começar.</p></div>
+    <h2>Letras</h2><div class="grid" id="gL"></div>
+    <h2>Números</h2><div class="grid" id="gN"></div>
+    <div style="text-align:center;margin-top:1.5rem"><button class="btn" data-tab="prac">Começar os exercícios</button></div>
+  </section>
+
+  <section id="prac" hidden>
+    <p class="mut" id="hint" style="margin-bottom:.8rem"></p>
+    <div class="top">
+      <label>Conteúdo: <select id="pool"><option value="T">Letras e números</option><option value="L">Só letras</option><option value="N">Só números</option></select></label>
+      <span>⭐ <b id="sc">0</b></span><span>🔥 Sequência <b id="st">0</b></span><span id="qn"></span>
+    </div>
+    <div class="pb"><div id="bar"></div></div>
+    <div class="card" id="q" style="margin-top:1rem"></div>
+    <div id="fb"></div>
+  </section>
+</main>
+
+<footer class="cr">MorseLearn — Criado e desenvolvido por dineebr</footer>
+
+<script>
+const M={A:'.-',B:'-...',C:'-.-.',D:'-..',E:'.',F:'..-.',G:'--.',H:'....',I:'..',J:'.---',K:'-.-',L:'.-..',M:'--',N:'-.',O:'---',P:'.--.',Q:'--.-',R:'.-.',S:'...',T:'-',U:'..-',V:'...-',W:'.--',X:'-..-',Y:'-.--',Z:'--..',0:'-----',1:'.----',2:'..---',3:'...--',4:'....-',5:'.....',6:'-....',7:'--...',8:'---..',9:'----.'};
+const L='ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),N='0123456789'.split(''),WORDS=['SOS','OI','SIM','PAZ','AMOR','CASA','MORSE'];
+const $=s=>document.querySelector(s);
+const ls={g(k){try{return localStorage.getItem(k)}catch(e){return null}},s(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+
+/* ---------- Áudio (Web Audio API) ---------- */
+let ac;const U=.08;
+const ctx=()=>{ac=ac||new(window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();return ac};
+function tone(f,t,d,v=.22){const c=ctx(),o=c.createOscillator(),g=c.createGain();o.frequency.value=f;o.connect(g);g.connect(c.destination);
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.008);g.gain.setValueAtTime(v,t+d-.008);g.gain.linearRampToValueAtTime(0,t+d);o.start(t);o.stop(t+d+.01)}
+function play(code){const c=ctx();let t=c.currentTime+.05;
+  for(const s of code){if(s==='.'||s==='-'){const d=s==='.'?U:3*U;tone(620,t,d);t+=d+U}else t+=2*U}}
+function sfx(ok){const t=ctx().currentTime;if(ok){tone(880,t,.1);tone(1320,t+.12,.16)}else tone(190,t,.35)}
+
+/* ---------- Etapa 1: Aprender ---------- */
+const vis=c=>[...c].map(s=>s==='.'?'<i class="d"></i>':s==='-'?'<i class="l"></i>':'<i class="sp"></i>').join('');
+let seen=new Set((ls.g('ml_seen')||'').split('').filter(Boolean));
+const grid=(id,a)=>$(id).innerHTML=a.map(k=>`<button class="ch" data-k="${k}" aria-label="${k}"><b>${k}</b><small>${M[k]}</small></button>`).join('');
+function upd(){const n=seen.size;$('#lp').textContent=`${n} de 36 explorados`;$('#lbar').style.width=n/36*100+'%';
+  document.querySelectorAll('.ch').forEach(b=>b.classList.toggle('seen',seen.has(b.dataset.k)));
+  $('#hint').textContent=n<36?`Você explorou ${n} de 36 caracteres. Se precisar, volte à aba Aprender para ouvir os que faltam.`:'Você explorou todos os caracteres. Bons exercícios!'}
+function pick(k){play(M[k]);
+  $('#det').innerHTML=`<div class="dk">${k}</div><div class="big">${vis(M[k])}</div><p class="mut" style="font-family:monospace;letter-spacing:3px">${M[k]}</p><button class="btn" onclick="play(M['${k}'])">🔊 Ouvir de novo</button>`;
+  seen.add(k);ls.s('ml_seen',[...seen].join(''));upd()}
+
+/* ---------- Etapa 2: Exercícios ---------- */
+let Q=[],qi=0,score=0,streak=0,right=0,locked=false,pool=[...L,...N],buf='';
+const rnd=a=>a[Math.random()*a.length|0];
+function start(){const p=$('#pool').value;pool=p==='L'?L:p==='N'?N:[...L,...N];Q=[];let last='';
+  for(let i=0;i<10;i++){let k;do{k=rnd(pool)}while(k===last);last=k;const t=['choice','type','send'][i%3];
+    Q.push(t==='send'&&i>=5&&p!=='N'?{t,w:rnd(WORDS)}:{t,k})}
+  qi=score=streak=right=0;render()}
+function render(){
+  if(qi>=Q.length)return end();
+  const q=Q[qi];locked=false;buf='';
+  $('#bar').style.width=qi/Q.length*100+'%';$('#sc').textContent=score;$('#st').textContent=streak;$('#qn').textContent=`Questão ${qi+1}/${Q.length}`;$('#fb').innerHTML='';
+  const listen=`<button class="btn sec" onclick="play(M['${q.k}'])">🔊 Ouvir</button>`;let h='';
+  if(q.t==='choice'){
+    const o=new Set([q.k]);while(o.size<4)o.add(rnd(pool));
+    h=`<p class="ask">Qual caractere corresponde a este código?</p><div class="big">${vis(M[q.k])}</div>${listen}
+    <div class="opts">${[...o].sort(()=>Math.random()-.5).map(x=>`<button class="btn opt" data-a="${x}">${x}</button>`).join('')}</div>`;
+  }else if(q.t==='type'){
+    h=`<p class="ask">Digite o caractere que corresponde a este código:</p><div class="big">${vis(M[q.k])}</div>${listen}<br>
+    <input id="ans" maxlength="1" autocomplete="off" aria-label="Sua resposta"><br><button class="btn" id="ok">Verificar</button>`;
+  }else{
+    h=`<p class="ask">Escreva em Morse: <b class="tgt">${q.w||q.k}</b></p><div class="big" id="inp"><span class="mut">Use os botões abaixo</span></div>
+    <div><button class="btn k" data-s=".">• Ponto</button><button class="btn k" data-s="-">▬ Traço</button>
+    ${q.w?'<button class="btn sec" data-s=" ">Próxima letra</button>':''}<button class="btn sec" data-s="⌫" aria-label="Apagar">⌫</button></div>
+    <button class="btn" id="ok">Verificar</button>`;
+  }
+  $('#q').innerHTML=h;
+  if(q.t!=='send')setTimeout(()=>play(M[q.k]),250);
+  if($('#ans'))$('#ans').focus();
+}
+function key(s){if(locked)return;
+  if(s==='⌫')buf=buf.slice(0,-1);
+  else if(s===' '){if(buf&&!buf.endsWith(' '))buf+=' '}
+  else{buf+=s;tone(620,ctx().currentTime+.01,s==='.'?U:3*U)}
+  $('#inp').innerHTML=vis(buf)||'<span class="mut">Use os botões abaixo</span>'}
+function check(a,btn){const q=Q[qi];if(locked||(!a&&q.t!=='choice'))return;locked=true;
+  let exp,ok,show;
+  if(q.t==='send'){exp=q.w?[...q.w].map(c=>M[c]).join(' '):M[q.k];ok=a.trim()===exp;show=`${q.w||q.k} = ${exp}`}
+  else{exp=q.k;ok=a.toUpperCase()===exp;show=`${exp} = ${M[exp]}`}
+  if(q.t==='choice')document.querySelectorAll('.opt').forEach(b=>{if(b.dataset.a===exp)b.classList.add('ok');else if(b===btn)b.classList.add('err')});
+  if(ok){score+=10+Math.min(streak,5)*2;streak++;right++}
+  else{streak=0;$('#q').classList.add('shake');setTimeout(()=>$('#q').classList.remove('shake'),350)}
+  sfx(ok);$('#sc').textContent=score;$('#st').textContent=streak;
+  if($('#ok'))$('#ok').style.display='none';
+  $('#fb').innerHTML=`<div class="fb ${ok?'ok':'err'}"><b>${ok?'✅ Correto!':'❌ Não foi dessa vez'}</b><p>${show}</p><button class="btn" id="nx">${qi+1<Q.length?'Continuar':'Ver resultado'}</button></div>`}
+function end(){$('#bar').style.width='100%';
+  const acc=Math.round(right/Q.length*100),b=Math.max(+ls.g('ml_best')||0,score);ls.s('ml_best',b);
+  $('#q').innerHTML=`<div class="dk">${acc>=80?'🏆':acc>=50?'👏':'💪'}</div><h2>Sessão concluída!</h2><p>Pontos: <b>${score}</b> · Acertos: <b>${right}/${Q.length}</b> (${acc}%)</p><p class="mut">Seu recorde: ${b} pontos</p>
+  <button class="btn" id="again">Praticar de novo</button><button class="btn sec" data-tab="learn">Rever as letras</button>`;
+  $('#fb').innerHTML='';$('#qn').textContent='Fim'}
+
+/* ---------- Navegação e eventos ---------- */
+function show(t){['learn','prac'].forEach(x=>$('#'+x).hidden=x!==t);
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
+  if(t==='prac'&&!Q.length)start();window.scrollTo(0,0)}
+document.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;
+  if(t.classList.contains('ch'))pick(t.dataset.k);
+  else if(t.dataset.tab)show(t.dataset.tab);
+  else if(t.dataset.a)check(t.dataset.a,t);
+  else if(t.dataset.s)key(t.dataset.s);
+  else if(t.id==='ok')check($('#ans')?$('#ans').value.trim():buf);
+  else if(t.id==='nx'){qi++;render()}
+  else if(t.id==='again')start()});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&!$('#prac').hidden){e.preventDefault();const b=$('#nx')||$('#ok');if(b)b.click()}});
+$('#pool').addEventListener('change',start);
+grid('#gL',L);grid('#gN',N);upd();
+</script>
+</body>
+</html>
